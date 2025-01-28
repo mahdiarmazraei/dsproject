@@ -1,6 +1,7 @@
 from lexical_analyzer import DFATokenizer
 from token_table import TokenTable
 from grammar import CPPGrammar
+from predictive_parser import PredictiveParser, build_parse_tree
 
 if __name__ == "__main__":
     # مثال ورودی
@@ -38,3 +39,27 @@ if __name__ == "__main__":
     for entry in table:
         print("{:<10} {:<15} {:<10}".format(entry[0], entry[1], entry[2]))
 
+    # مرحله ۳: ساخت Parse Table
+    grammar = CPPGrammar()
+    parse_table = grammar.parse_table
+    print("\nParse Table:")
+    for nt in grammar.non_terminals:
+        print(f"{nt}: {dict(parse_table[nt])}")
+
+    # مرحله ۴: تجزیه نحوی
+    parser = PredictiveParser(parse_table)
+    # try:
+    success = parser.parse(tokens)
+    if success:
+        print("\nParse Tree Productions:")
+        for prod in parser.productions:
+            print(f"{prod[0]} -> {' '.join(prod[1])}")
+
+        # ساخت درخت پارس
+        parse_tree = build_parse_tree(parser.productions, grammar)
+
+        print("\nParse Tree Structure:")
+        print(parse_tree)
+
+    # except SyntaxError as e:
+    #     print(f"Parse Error: {e}")
